@@ -10,7 +10,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-from .analysis import Analysis
+from bikefit.analysis import Analysis
 
 
 class BikeFit:
