@@ -1,5 +1,9 @@
 import asyncio
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -12,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 import qasync
 
+from src.bikefit.bikefit import BikeFit
 from widgets import VideoPlayer
 
 
@@ -40,10 +45,24 @@ class MainWindow(QMainWindow):
         self.input_player = VideoPlayer()
         self.main_layout.addWidget(self.input_player)
 
+        self.bikefit = BikeFit()
+        self.input_player.add_listener(self.analise_frame)
+        self.input_player.recording_changed.connect(self.on_recording_changed)
+
         # Controls layout
         self.load_button = QPushButton("Load")
         self.load_button.clicked.connect(self.load_source)
         self.main_layout.addWidget(self.load_button)
+
+    def on_recording_changed(self, is_recording):
+        self.video_file_radio.setEnabled(not is_recording)
+        self.webcam_radio.setEnabled(not is_recording)
+        self.load_button.setEnabled(not is_recording)
+
+    async def analise_frame(self, frame):
+        _, angles = await self.bikefit.analise_cyclist_frame(frame)
+        if angles:
+            print(angles)
 
     def load_source(self):
         if self.video_file_radio.isChecked():
