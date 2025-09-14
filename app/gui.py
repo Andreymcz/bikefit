@@ -1,6 +1,5 @@
 import asyncio
 import sys
-import cv2
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -20,19 +19,16 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Bikefit GUI")
+        self.resize(1024, 768)
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
         self.main_layout = QVBoxLayout(self.central_widget)
 
-        # Video players layout
-        video_layout = QHBoxLayout()
+        # Video player
         self.input_player = VideoPlayer()
-        self.analyzed_player = VideoPlayer()
-        video_layout.addWidget(self.input_player)
-        video_layout.addWidget(self.analyzed_player)
-        self.main_layout.addLayout(video_layout)
+        self.main_layout.addWidget(self.input_player)
 
         # Controls layout
         self.load_button = QPushButton("Load Video")
@@ -44,9 +40,7 @@ class MainWindow(QMainWindow):
             self, "Open Video", "", "Video Files (*.mp4 *.avi)"
         )
         if file_name:
-            video_capture = cv2.VideoCapture(file_name)
-            if video_capture.isOpened():
-                self.input_player.load_video(video_capture)
+            self.input_player.load_video(file_name)
 
 
 if __name__ == "__main__":
