@@ -121,45 +121,81 @@ class BikeFit:
                 frame_angles = {}
 
                 # Get coordinates
-                shoulder = [
+                left_shoulder = [
                     landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
                     landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].y,
                 ]
-                elbow = [
+                left_elbow = [
                     landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
                     landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].y,
                 ]
-                wrist = [
+                left_wrist = [
                     landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].x,
                     landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].y,
                 ]
-                hip = [
+                left_hip = [
                     landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].x,
                     landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].y,
                 ]
-                knee = [
+                left_knee = [
                     landmarks[self.mp_pose.PoseLandmark.LEFT_KNEE.value].x,
                     landmarks[self.mp_pose.PoseLandmark.LEFT_KNEE.value].y,
                 ]
-                ankle = [
+                left_ankle = [
                     landmarks[self.mp_pose.PoseLandmark.LEFT_ANKLE.value].x,
                     landmarks[self.mp_pose.PoseLandmark.LEFT_ANKLE.value].y,
                 ]
 
+                right_shoulder = [
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y,
+                ]
+                right_elbow = [
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].y,
+                ]
+                right_wrist = [
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].y,
+                ]
+                right_hip = [
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_HIP.value].y,
+                ]
+                right_knee = [
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].y,
+                ]
+                right_ankle = [
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,
+                    landmarks[self.mp_pose.PoseLandmark.RIGHT_ANKLE.value].y,
+                ]
+
                 # Store joint data
-                frame_joints["left_shoulder"] = (shoulder[0], shoulder[1], landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].visibility)
-                frame_joints["left_elbow"] = (elbow[0], elbow[1], landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].visibility)
-                frame_joints["left_wrist"] = (wrist[0], wrist[1], landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].visibility)
-                frame_joints["left_hip"] = (hip[0], hip[1], landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].visibility)
-                frame_joints["left_knee"] = (knee[0], knee[1], landmarks[self.mp_pose.PoseLandmark.LEFT_KNEE.value].visibility)
-                frame_joints["left_ankle"] = (ankle[0], ankle[1], landmarks[self.mp_pose.PoseLandmark.LEFT_ANKLE.value].visibility)
+                frame_joints["left_shoulder"] = (left_shoulder[0], left_shoulder[1], landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].visibility)
+                frame_joints["left_elbow"] = (left_elbow[0], left_elbow[1], landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].visibility)
+                frame_joints["left_wrist"] = (left_wrist[0], left_wrist[1], landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].visibility)
+                frame_joints["left_hip"] = (left_hip[0], left_hip[1], landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].visibility)
+                frame_joints["left_knee"] = (left_knee[0], left_knee[1], landmarks[self.mp_pose.PoseLandmark.LEFT_KNEE.value].visibility)
+                frame_joints["left_ankle"] = (left_ankle[0], left_ankle[1], landmarks[self.mp_pose.PoseLandmark.LEFT_ANKLE.value].visibility)
+
+                frame_joints["right_shoulder"] = (right_shoulder[0], right_shoulder[1], landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].visibility)
+                frame_joints["right_elbow"] = (right_elbow[0], right_elbow[1], landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].visibility)
+                frame_joints["right_wrist"] = (right_wrist[0], right_wrist[1], landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].visibility)
+                frame_joints["right_hip"] = (right_hip[0], right_hip[1], landmarks[self.mp_pose.PoseLandmark.RIGHT_HIP.value].visibility)
+                frame_joints["right_knee"] = (right_knee[0], right_knee[1], landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].visibility)
+                frame_joints["right_ankle"] = (right_ankle[0], right_ankle[1], landmarks[self.mp_pose.PoseLandmark.RIGHT_ANKLE.value].visibility)
 
                 # Calculate angles
-                elbow_angle = self._calculate_angle(shoulder, elbow, wrist)
-                knee_angle = self._calculate_angle(hip, knee, ankle)
+                left_elbow_angle = self._calculate_angle(left_shoulder, left_elbow, left_wrist)
+                left_knee_angle = self._calculate_angle(left_hip, left_knee, left_ankle)
+                right_elbow_angle = self._calculate_angle(right_shoulder, right_elbow, right_wrist)
+                right_knee_angle = self._calculate_angle(right_hip, right_knee, right_ankle)
 
-                frame_angles["left_elbow"] = elbow_angle
-                frame_angles["left_knee"] = knee_angle
+                frame_angles["left_elbow"] = left_elbow_angle
+                frame_angles["left_knee"] = left_knee_angle
+                frame_angles["right_elbow"] = right_elbow_angle
+                frame_angles["right_knee"] = right_knee_angle
 
                 # Lock before updating shared analysis object
                 with self._lock:

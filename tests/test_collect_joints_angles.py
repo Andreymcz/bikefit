@@ -52,7 +52,9 @@ def test_collect_joints_angles(bikefit: BikeFit):
     # Check for specific joints
     expected_joints = [
         "left_shoulder", "left_elbow", "left_wrist",
-        "left_hip", "left_knee", "left_ankle"
+        "left_hip", "left_knee", "left_ankle",
+        "right_shoulder", "right_elbow", "right_wrist",
+        "right_hip", "right_knee", "right_ankle"
     ]
     for joint_name in expected_joints:
         assert joint_name in first_frame_joints
@@ -61,7 +63,7 @@ def test_collect_joints_angles(bikefit: BikeFit):
         assert len(first_frame_joints[joint_name]) == 3
 
     # Check for specific angles
-    expected_angles = ["left_elbow", "left_knee"]
+    expected_angles = ["left_elbow", "left_knee", "right_elbow", "right_knee"]
     for angle_name in expected_angles:
         assert angle_name in first_frame_angles
         # Check that angle data is a float
