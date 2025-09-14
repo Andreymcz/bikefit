@@ -1,5 +1,11 @@
 import cv2
-from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtCore import Qt, QUrl, Slot
+from PySide6.QtMultimedia import (
+    QCamera,
+    QMediaPlayer,
+    QMediaCaptureSession,
+    QMediaDevices,
+)
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import (
     QWidget,
@@ -8,7 +14,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
 )
-from PySide6.QtCore import Qt, QUrl
 
 
 class VideoPlayer(QWidget):
@@ -18,6 +23,11 @@ class VideoPlayer(QWidget):
         self.media_player = QMediaPlayer()
         self.video_widget = QVideoWidget()
         self.media_player.setVideoOutput(self.video_widget)
+
+        self.camera = None
+        self.capture_session = QMediaCaptureSession()
+        self.capture_session.setVideoOutput(self.video_widget)
+        self.source_type = None
 
         self.play_button = QPushButton("Play")
         self.pause_button = QPushButton("Pause")
@@ -40,28 +50,60 @@ class VideoPlayer(QWidget):
         self.media_player.durationChanged.connect(self.duration_changed)
 
     def load_video(self, file_name: str):
+        if self.camera and self.camera.isActive():
+            self.camera.stop()
+        self.media_player.setVideoOutput(self.video_widget)
+        self.source_type = "file"
         self.media_player.setSource(QUrl.fromLocalFile(file_name))
         self.play_button.setEnabled(True)
-
-    def play_video(self):
+        self.time_slider.setEnabled(True)
         self.media_player.play()
-
-    def pause_video(self):
         self.media_player.pause()
 
+    def load_webcam(self):
+        self.media_player.stop()
+        self.media_player.setSource(QUrl())
+        self.capture_session.setVideoOutput(self.video_widget)
+        self.source_type = "webcam"
+        available_cameras = QMediaDevices.videoInputs()
+        if not available_cameras:
+            print("No webcam found.")
+            return
+
+        self.camera = QCamera(available_cameras[0])
+        self.capture_session.setCamera(self.camera)
+        self.play_button.setEnabled(True)
+        self.time_slider.setEnabled(False)
+        self.camera.start()
+
+    def play_video(self):
+        if self.source_type == "file":
+            self.media_player.play()
+        elif self.source_type == "webcam" and self.camera:
+            self.camera.start()
+
+    def pause_video(self):
+        if self.source_type == "file":
+            self.media_player.pause()
+        elif self.source_type == "webcam" and self.camera:
+            self.camera.stop()
+
     def set_position(self, position):
-        self.media_player.setPosition(position)
+        if self.source_type == "file":
+            self.media_player.setPosition(position)
 
     def position_changed(self, position):
-        self.time_slider.setValue(position)
+        if self.source_type == "file":
+            self.time_slider.setValue(position)
 
     def duration_changed(self, duration):
-        self.time_slider.setRange(0, duration)
+        if self.source_type == "file":
+            self.time_slider.setRange(0, duration)
 
     def set_frame(self, frame_number):
         # This method might need adjustment depending on how you want to sync
         # with the analyzed video. For now, it seeks based on milliseconds.
-        if self.media_player.duration() > 0:
+        if self.source_type == "file" and self.media_player.duration() > 0:
             position = (
                 frame_number
                 / self.get_frame_count()
@@ -72,17 +114,19 @@ class VideoPlayer(QWidget):
 
     def get_frame_count(self):
         # This is an approximation. A more accurate way might be needed.
-        video_capture = cv2.VideoCapture(
-            self.media_player.source().toLocalFile()
-        )
-        if video_capture.isOpened():
-            return int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        if self.source_type == "file":
+            video_capture = cv2.VideoCapture(
+                self.media_player.source().toLocalFile()
+            )
+            if video_capture.isOpened():
+                return int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
         return 0
 
     def get_fps(self):
-        video_capture = cv2.VideoCapture(
-            self.media_player.source().toLocalFile()
-        )
-        if video_capture.isOpened():
-            return video_capture.get(cv2.CAP_PROP_FPS)
+        if self.source_type == "file":
+            video_capture = cv2.VideoCapture(
+                self.media_player.source().toLocalFile()
+            )
+            if video_capture.isOpened():
+                return video_capture.get(cv2.CAP_PROP_FPS)
         return 0
