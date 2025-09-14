@@ -37,6 +37,7 @@ class VideoPlayer(QWidget):
 
         # Timer for playback
         self.timer = QTimer()
+        self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.next_frame)
 
         # Connect signals
@@ -61,9 +62,13 @@ class VideoPlayer(QWidget):
 
     def next_frame(self):
         if self.video_capture:
-            current_frame = self.time_slider.value()
-            if current_frame < self.time_slider.maximum():
-                self.time_slider.setValue(current_frame + 1)
+            ret, frame = self.video_capture.read()
+            if ret:
+                current_frame = int(
+                    self.video_capture.get(cv2.CAP_PROP_POS_FRAMES)
+                )
+                self.time_slider.setValue(current_frame)
+                self.display_frame(frame)
             else:
                 self.timer.stop()
 
